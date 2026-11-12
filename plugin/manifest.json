@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "szs.jibun",
+  "name": "Jibun Techo",
+  "version": "0.1.0",
+  "author": "szs",
+  "description": "Jibun Techo planner status in the bar; click to open the planner TUI.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Jibun Techo",
+    "category": "Time",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {},
+    "schema": []
+  }
+}
