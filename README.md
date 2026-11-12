@@ -3,3 +3,6 @@ A Rust-based TUI version of the Jibun Techo Life Planner.  (working on an Omarch
 
 # For installing to test/use
 Download the repo, set `install.sh` to be executable (`chmod -x install.sh`), and finally run `install.sh` (`./install.sh`)!
+
+# Honesty Note
+Claude helped make this (like a lot)...
