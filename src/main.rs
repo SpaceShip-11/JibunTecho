@@ -1,11 +1,11 @@
 use chrono::{Datelike, Duration as Dur, Local, NaiveDate};
-use ratatui::{prelude::*, widgets::*};
-use serde::{Deserialize, Serialize};
 use crossterm::event::{
     self, DisableFocusChange, EnableFocusChange, Event as CEvent, KeyCode, KeyEventKind,
     KeyModifiers,
 };
 use crossterm::execute;
+use ratatui::{prelude::*, widgets::*};
+use serde::{Deserialize, Serialize};
 use std::{
     fs, io,
     path::PathBuf,
@@ -106,7 +106,9 @@ fn parse_time(s: &str) -> (Option<String>, String) {
     if let Some((a, b)) = s.split_once(' ') {
         let ok = a.len() == 5
             && a.as_bytes()[2] == b':'
-            && a.chars().enumerate().all(|(i, c)| i == 2 || c.is_ascii_digit());
+            && a.chars()
+                .enumerate()
+                .all(|(i, c)| i == 2 || c.is_ascii_digit());
         if ok {
             return (Some(a.to_string()), b.trim().to_string());
         }
@@ -233,7 +235,13 @@ impl App {
             };
             let date = matches!(kind, Kind::Event | Kind::Todo | Kind::Diary)
                 .then(|| self.sel.format("%Y-%m-%d").to_string());
-            self.store.items.push(Item { kind, date, time, title, done: false });
+            self.store.items.push(Item {
+                kind,
+                date,
+                time,
+                title,
+                done: false,
+            });
             self.store.save();
         }
     }
@@ -329,8 +337,7 @@ fn draw(f: &mut Frame, app: &App) {
     let tabs = Tabs::new(TABS.iter().map(|t| Line::from(*t)))
         .select(app.tab)
         .block(
-            Block::bordered()
-                .title(format!(" Jibun Techo · {} ", app.sel.format("%Y-%m-%d %a"))),
+            Block::bordered().title(format!(" Jibun Techo · {} ", app.sel.format("%Y-%m-%d %a"))),
         )
         .highlight_style(Style::new().bold().fg(Color::Yellow));
     f.render_widget(tabs, chunks[0]);
@@ -367,8 +374,8 @@ fn mini_month(f: &mut Frame, area: Rect, app: &App, y: i32, m: u32) {
     let today = Local::now().date_naive();
     let first = NaiveDate::from_ymd_opt(y, m, 1).unwrap();
     let offset = first.weekday().num_days_from_monday();
-    let mut lines = vec![Line::from("Mo Tu We Th Fr Sa Su")
-        .style(Style::new().add_modifier(Modifier::DIM))];
+    let mut lines =
+        vec![Line::from("Mo Tu We Th Fr Sa Su").style(Style::new().add_modifier(Modifier::DIM))];
     let mut spans: Vec<Span> = (0..offset).map(|_| Span::raw("   ")).collect();
     for day in 1..=days_in_month(y, m) {
         let d = NaiveDate::from_ymd_opt(y, m, day).unwrap();
@@ -535,8 +542,10 @@ fn pane<'a>(app: &App, kind: Kind, title: &'a str, ids: &[usize]) -> Paragraph<'
 
 fn draw_day(f: &mut Frame, area: Rect, app: &App) {
     let ids = app.day_items(app.sel);
-    let cols = Layout::horizontal([Constraint::Percentage(55), Constraint::Percentage(45)]).split(area);
-    let left = Layout::vertical([Constraint::Percentage(55), Constraint::Percentage(45)]).split(cols[0]);
+    let cols =
+        Layout::horizontal([Constraint::Percentage(55), Constraint::Percentage(45)]).split(area);
+    let left =
+        Layout::vertical([Constraint::Percentage(55), Constraint::Percentage(45)]).split(cols[0]);
     f.render_widget(pane(app, Kind::Event, " Schedule ", &ids), left[0]);
     f.render_widget(pane(app, Kind::Todo, " To-do ", &ids), left[1]);
     f.render_widget(pane(app, Kind::Diary, " Diary ", &ids), cols[1]);
@@ -568,7 +577,9 @@ fn draw_list(f: &mut Frame, area: Rect, app: &App, title: &str) {
 // ───────────────────────── waybar status ─────────────────────────
 
 fn esc(s: &str) -> String {
-    s.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;")
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }
 
 fn status() {
@@ -597,7 +608,7 @@ fn status() {
         tip.push('\n');
     }
 
-    let mut text = format!("\u{f00ed} {}", today.format("%a %d %b"));
+    let mut text = format!("\u{f00ed}");
     if pending > 0 {
         text.push_str(&format!("  {pending}"));
     }
